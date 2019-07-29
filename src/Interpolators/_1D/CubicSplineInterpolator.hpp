@@ -279,7 +279,8 @@ CubicSplineInterpolator<Real>::setupInterpolator()
   //Ac is a vector of the upper diagonals of matrix A
   //
   //Since there is no upper diagonal on the last row, the last value must be zero.
-  for (size_t i = 0; i < X.size()-1; ++i)
+  Ac(0)=0.;
+  for (size_t i = 1; i < X.size()-1; ++i)
   {
       Ac(i) = 1/(X(i+1) - X(i));
   }
@@ -288,40 +289,33 @@ CubicSplineInterpolator<Real>::setupInterpolator()
   Ac(X.size()-1) = 0.0;
 
   //Ab is a vector of the diagnoals of matrix A
-  Ab(0) = 2/(X(1) - X(0));
+  Ab(0)=1.;
   for (size_t i = 1; i < X.size()-1; ++i)
   {
       Ab(i) = 2 / (X(i)-X(i-1)) + 2 / (X(i+1) - X(i));
   }
-  Ab(X.size()-1) = 2/(X(X.size()-1) - X(X.size()-1-1));
+  Ab(X.size()-1) = 1.;
 
 
   //Aa is a vector of the lower diagonals of matrix A
   //
   //Since there is no upper diagonal on the first row, the first value must be zero.
   Aa(0) = 0.0;
-  for (size_t i = 1; i < X.size(); ++i)
+  for (size_t i = 1; i < X.size()-1; ++i)
   {
       Aa(i) = 1 / (X(i) - X(i-1));
   }
+  Aa(X.size()-1)=0.;
 
 
 
   // setup RHS vector
-  for(int i = 0; i < X.size(); ++i)
+  b(0)=0.;
+  b(X.size()-1)=0.;
+
+  for(int i =1; i < X.size()-1; ++i)
   {   
-      if(i == 0)
-      {   
-        b(i) = 3 * ( Y(i+1) - Y(i) )/pow(X(i+1)-X(i),2);
-      }
-      else if( i == X.size()-1 )
-      {   
-        b(i) = 3 * (Y(i) - Y(i-1))/pow(X(i) - X(i-1),2);
-      }
-      else
-      { 
-        b(i) = 3 * ( (Y(i) - Y(i-1))/(pow(X(i)-X(i-1),2)) + (Y(i+1) - Y(i))/pow(X(i+1) - X(i),2));     
-      }
+     b(i) = 3 * ( (Y(i) - Y(i-1))/(pow(X(i)-X(i-1),2)) + (Y(i+1) - Y(i))/pow(X(i+1) - X(i),2));     
   }
 
 
